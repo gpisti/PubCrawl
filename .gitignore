@@ -44,3 +44,4 @@ Thumbs.db
 
 backend/scripts/*.log
 backend/scripts/*.tmp
+.git-credentials
