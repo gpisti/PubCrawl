@@ -14,7 +14,7 @@ const pool = new Pool({
   database: url.pathname.slice(1),
   user: url.username,
   password: url.password,
-  ssl: false
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 // Test database connection
