@@ -3,6 +3,14 @@ require('dotenv').config();
 
 // Parse Railway connection string
 const url = new URL(process.env.DATABASE_URL);
+console.log('Connection details:', {
+  host: url.hostname,
+  port: url.port,
+  database: url.pathname.slice(1),
+  user: url.username,
+  password: url.password ? '***' : 'undefined'
+});
+
 const pool = new Pool({
   host: url.hostname,
   port: url.port,
