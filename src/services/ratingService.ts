@@ -1,53 +1,50 @@
 import { PubRating } from '../types';
 
-// Local storage key for ratings
-const RATINGS_KEY = 'pubcrawl_ratings';
+// Backend API base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-// Helper functions for localStorage
-const getStoredRatings = (): PubRating[] => {
-  try {
-    const stored = localStorage.getItem(RATINGS_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
+// Helper function for API calls
+const apiCall = async (endpoint: string, options: RequestInit = {}) => {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    ...options,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+    throw new Error(errorData.error || `HTTP ${response.status}`);
   }
-};
 
-const saveRatings = (ratings: PubRating[]): void => {
-  localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings));
+  return response.json();
 };
 
 export const ratingService = {
   async addRating(pubId: string, userId: string, rating: number, comment: string): Promise<{ message: string }> {
-    const ratings = getStoredRatings();
-    
-    // Check if user already rated this pub
-    const existingRatingIndex = ratings.findIndex(r => r.pubId === pubId && r.userId === userId);
-    
-    const newRating: PubRating = {
-      id: `rating_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      pubId,
-      userId,
-      rating,
-      comment: comment.trim(),
-      createdAt: new Date().toISOString()
-    };
-
-    if (existingRatingIndex >= 0) {
-      // Update existing rating
-      ratings[existingRatingIndex] = newRating;
-    } else {
-      // Add new rating
-      ratings.push(newRating);
-    }
-
-    saveRatings(ratings);
-    return { message: 'Rating saved successfully' };
+    return apiCall('/pub-ratings', {
+      method: 'POST',
+      body: JSON.stringify({
+        pubId,
+        userId,
+        rating,
+        comment: comment.trim()
+      })
+    });
   },
 
   async getRatingsForPub(pubId: string): Promise<PubRating[]> {
-    const ratings = getStoredRatings();
-    return ratings.filter(r => r.pubId === pubId);
+    const rows = await apiCall(`/pub-ratings/${pubId}`);
+    return (rows as any[]).map(r => ({
+      id: r.id,
+      pubId: r.pub_id ?? r.pubId,
+      userId: r.user_id ?? r.userId,
+      rating: r.rating,
+      comment: r.comment ?? '',
+      createdAt: r.created_at ?? r.createdAt,
+    } satisfies PubRating));
   },
 
   async getAverageRating(pubId: string): Promise<number> {
@@ -55,18 +52,21 @@ export const ratingService = {
     if (ratings.length === 0) return 0;
     
     const sum = ratings.reduce((total, rating) => total + rating.rating, 0);
-    return Math.round((sum / ratings.length) * 10) / 10; // Round to 1 decimal place
+    return Math.round((sum / ratings.length) * 10) / 10;
   },
 
   async getUserRating(pubId: string, userId: string): Promise<PubRating | null> {
-    const ratings = getStoredRatings();
-    return ratings.find(r => r.pubId === pubId && r.userId === userId) || null;
+    try {
+      const ratings = await this.getRatingsForPub(pubId);
+      return ratings.find(r => r.userId === userId) || null;
+    } catch (error) {
+      return null;
+    }
   },
 
   async deleteRating(ratingId: string): Promise<{ message: string }> {
-    const ratings = getStoredRatings();
-    const filteredRatings = ratings.filter(r => r.id !== ratingId);
-    saveRatings(filteredRatings);
-    return { message: 'Rating deleted successfully' };
+    return apiCall(`/pub-ratings/${ratingId}`, {
+      method: 'DELETE'
+    });
   }
 };
