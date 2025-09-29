@@ -7,8 +7,13 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // PostgreSQL connection
+const url = new URL(process.env.DATABASE_URL);
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  host: url.hostname,
+  port: url.port,
+  database: url.pathname.slice(1),
+  user: url.username,
+  password: url.password,
   ssl: false
 });
 
