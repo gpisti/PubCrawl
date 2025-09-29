@@ -1,0 +1,6 @@
+backend/
+*.sqlite
+*.db
+.env
+.env.local
+.env.production
