@@ -1,6 +1,11 @@
 backend/
+backend/**
 *.sqlite
 *.db
 .env
 .env.local
 .env.production
+server-production.js
+server.js
+server-old.js
+server-sqlite.js
