@@ -343,11 +343,11 @@ export const PubMap: React.FC<PubMapProps> = ({
   };
 
   return (
-    <div className="relative">
-      <div ref={mapRef} className="w-full h-96 rounded-lg shadow-lg" />
+    <div className="relative z-0">
+      <div ref={mapRef} className="w-full h-96 rounded-lg shadow-lg relative z-0" />
       
       {/* Legend */}
-      <div className="absolute top-4 right-4 bg-white p-3 rounded-lg shadow-lg">
+      <div className="absolute top-4 right-4 bg-white p-3 rounded-lg shadow-lg z-10">
         <h4 className="font-semibold text-sm mb-2">Legend</h4>
         <div className="space-y-1 text-xs">
           <div className="flex items-center">
