@@ -12,7 +12,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate 
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
@@ -21,49 +21,49 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate 
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <button
               onClick={() => onNavigate('home')}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 currentPage === 'home'
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <Home className="h-4 w-4" />
-              <span>Home</span>
+              <span className="hidden sm:inline">Home</span>
             </button>
             
             <button
               onClick={() => onNavigate('planner')}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 currentPage === 'planner'
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <NavigationIcon className="h-4 w-4" />
-              <span>Route Optimizer</span>
+              <span className="hidden sm:inline">Route Optimizer</span>
             </button>
             
             <button
               onClick={() => onNavigate('routes')}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 currentPage === 'routes'
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <List className="h-4 w-4" />
-              <span>My Routes</span>
+              <span className="hidden sm:inline">My Routes</span>
             </button>
 
             {/* User Info */}
             {user && (
-              <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 sm:space-x-3 ml-2 sm:ml-4 pl-2 sm:pl-4 border-l border-gray-200">
+                <div className="flex items-center space-x-1 sm:space-x-2">
                   <span className="text-2xl">{user.avatar}</span>
-                  <span className="text-sm font-medium text-gray-700">{user.name}</span>
+                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.name}</span>
                 </div>
                 <button
                   onClick={logout}
