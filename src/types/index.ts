@@ -39,9 +39,9 @@ export interface RouteWithPubCount extends Omit<Route, 'pubs'> {
   pub_count: number;
 }
 
-  export interface GuestUser {
+  export interface User {
     id: string;
-    name: string;
+    username: string;
     avatar: string;
     createdAt: string;
   }
