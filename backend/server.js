@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const Database = require('better-sqlite3');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
@@ -22,6 +23,97 @@ console.log('Connected to SQLite database');
 // Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'PubCrawl API is running' });
+});
+
+// Auth routes
+app.post('/api/auth/register', (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+    
+    if (username.length < 3) {
+      return res.status(400).json({ error: 'Username must be at least 3 characters' });
+    }
+    
+    if (password.length < 4) {
+      return res.status(400).json({ error: 'Password must be at least 4 characters' });
+    }
+    
+    // Check if username exists
+    const checkStmt = db.prepare('SELECT id FROM users WHERE username = ?');
+    const existing = checkStmt.get(username);
+    
+    if (existing) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+    
+    // Hash password
+    const saltRounds = 10;
+    const hashedPassword = bcrypt.hashSync(password, saltRounds);
+    
+    // Generate user ID
+    const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Random avatar
+    const avatars = ['🍺', '🍸', '🍷', '🥃', '🍻', '🍹', '🥤', '🍾'];
+    const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+    
+    // Insert user
+    const insertStmt = db.prepare(`
+      INSERT INTO users (id, username, password, avatar, created_at)
+      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `);
+    
+    insertStmt.run(userId, username, hashedPassword, avatar);
+    
+    res.status(201).json({
+      id: userId,
+      username,
+      avatar,
+      message: 'User created successfully'
+    });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Failed to register user' });
+  }
+});
+
+app.post('/api/auth/login', (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+    
+    // Find user
+    const stmt = db.prepare('SELECT id, username, password, avatar FROM users WHERE username = ?');
+    const user = stmt.get(username);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    
+    // Check password
+    const isValidPassword = bcrypt.compareSync(password, user.password);
+    
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    
+    res.json({
+      id: user.id,
+      username: user.username,
+      avatar: user.avatar,
+      message: 'Login successful'
+    });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'Failed to login' });
+  }
 });
 
 // Routes API
