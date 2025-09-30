@@ -3,8 +3,8 @@ import { Navigation } from './components/Navigation';
 import { HomePage } from './components/HomePage';
 import { RouteOptimizerPage } from './components/RouteOptimizerPage';
 import { SavedRoutesPage } from './components/SavedRoutesPage';
-import { WelcomeModal } from './components/WelcomeModal';
-import { GuestAuthProvider, useGuestAuth } from './contexts/GuestAuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LoginModal } from './components/LoginModal';
 import { api } from './services/api';
 
 type Page = 'home' | 'planner' | 'routes';
@@ -13,7 +13,7 @@ const AppContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [refreshRoutes, setRefreshRoutes] = useState(0);
   const [joinMessage, setJoinMessage] = useState('');
-  const { user, isLoading } = useGuestAuth();
+  const { user, isLoading } = useAuth();
 
   // Handle URL routing for route sharing
   useEffect(() => {
@@ -95,16 +95,16 @@ const AppContent: React.FC = () => {
         <SavedRoutesPage onCreateNew={handleCreateNew} key={refreshRoutes} />
       )}
 
-      <WelcomeModal isOpen={!user} />
+      <LoginModal isOpen={!user} onClose={() => {}} />
     </div>
   );
 };
 
 function App() {
   return (
-    <GuestAuthProvider>
+    <AuthProvider>
       <AppContent />
-    </GuestAuthProvider>
+    </AuthProvider>
   );
 }
 
