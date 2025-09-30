@@ -79,6 +79,18 @@ function migrate() {
     `);
     console.log('✓ Pub ratings table created');
     
+    // Create users table
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        avatar TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✓ Users table created');
+    
     // Create indexes
     db.exec(`
       CREATE INDEX IF NOT EXISTS idx_routes_owner_id ON routes(owner_id);
