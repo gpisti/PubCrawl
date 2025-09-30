@@ -76,6 +76,48 @@ export const PubMap: React.FC<PubMapProps> = ({
     loadRatings();
   }, [pubs]);
 
+  // Update popup content when ratings change
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    
+    // Update all existing popups with new rating data
+    Object.keys(markersRef.current).forEach(pubId => {
+      const marker = markersRef.current[pubId];
+      const pub = pubs.find(p => p.id === pubId);
+      if (pub && marker) {
+        const avgRating = pubRatings[pub.id] || 0;
+        const ratingStars = avgRating > 0 ? '⭐'.repeat(Math.round(avgRating)) : 'Még nincs értékelés';
+        
+        const popupContent = `
+          <div style="min-width: 200px;">
+            <h3 style="margin: 0 0 8px 0; color: #1f2937;">${pub.name}</h3>
+            <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 14px;">${pub.address}</p>
+            <p style="margin: 0 0 4px 0; color: #6b7280; font-size: 13px;">${pub.description}</p>
+            <div style="margin: 0 0 8px 0; color: #f59e0b; font-size: 12px;">
+              ${avgRating > 0 ? `${avgRating}/5 ${ratingStars}` : ratingStars}
+            </div>
+            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+              <button 
+                onclick="window.togglePub('${pub.id}')"
+                style="flex: 1; padding: 6px 12px; border: none; border-radius: 4px; background: #10b981; color: white; cursor: pointer; font-size: 12px;"
+              >
+                Add
+              </button>
+              <button 
+                onclick="window.ratePub('${pub.id}')"
+                style="flex: 1; padding: 6px 12px; border: none; border-radius: 4px; background: #f59e0b; color: white; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 4px;"
+              >
+                ⭐ Értékelés
+              </button>
+            </div>
+          </div>
+        `;
+        
+        marker.setPopupContent(popupContent);
+      }
+    });
+  }, [pubRatings, pubs]);
+
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 

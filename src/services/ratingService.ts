@@ -50,10 +50,13 @@ export const ratingService = {
 
   async getAverageRating(pubId: string): Promise<number> {
     const ratings = await this.getRatingsForPub(pubId);
+    console.log(`getAverageRating for ${pubId}:`, ratings);
     if (ratings.length === 0) return 0;
     
     const sum = ratings.reduce((total, rating) => total + rating.rating, 0);
-    return Math.round((sum / ratings.length) * 10) / 10;
+    const average = Math.round((sum / ratings.length) * 10) / 10;
+    console.log(`Average rating for ${pubId}: ${average} (from ${ratings.length} ratings)`);
+    return average;
   },
 
   async getUserRating(pubId: string, userId: string): Promise<PubRating | null> {
