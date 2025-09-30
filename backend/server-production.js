@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
@@ -36,6 +37,95 @@ app.use(express.json());
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'PubCrawl API is running' });
+});
+
+// Auth routes
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+    
+    if (username.length < 3) {
+      return res.status(400).json({ error: 'Username must be at least 3 characters' });
+    }
+    
+    if (password.length < 4) {
+      return res.status(400).json({ error: 'Password must be at least 4 characters' });
+    }
+    
+    // Check if username exists
+    const checkResult = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
+    
+    if (checkResult.rows.length > 0) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+    
+    // Hash password
+    const saltRounds = 10;
+    const hashedPassword = bcrypt.hashSync(password, saltRounds);
+    
+    // Generate user ID
+    const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Random avatar
+    const avatars = ['🍺', '🍸', '🍷', '🥃', '🍻', '🍹', '🥤', '🍾'];
+    const avatar = avatars[Math.floor(Math.random() * avatars.length)];
+    
+    // Insert user
+    await pool.query(`
+      INSERT INTO users (id, username, password, avatar, created_at)
+      VALUES ($1, $2, $3, $4, NOW())
+    `, [userId, username, hashedPassword, avatar]);
+    
+    res.status(201).json({
+      id: userId,
+      username,
+      avatar,
+      message: 'User created successfully'
+    });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Failed to register user' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+    
+    // Find user
+    const result = await pool.query('SELECT id, username, password, avatar FROM users WHERE username = $1', [username]);
+    
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    
+    const user = result.rows[0];
+    
+    // Check password
+    const isValidPassword = bcrypt.compareSync(password, user.password);
+    
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    
+    res.json({
+      id: user.id,
+      username: user.username,
+      avatar: user.avatar,
+      message: 'Login successful'
+    });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'Failed to login' });
+  }
 });
 
 // Routes API

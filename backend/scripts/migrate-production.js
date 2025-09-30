@@ -96,6 +96,18 @@ async function migrate() {
     `);
     console.log('✓ Pub ratings table created');
     
+    // Create users table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        avatar TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✓ Users table created');
+    
     // Create indexes
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_routes_owner_id ON routes(owner_id);
