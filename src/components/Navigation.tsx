@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapPin, Home, List, Navigation as NavigationIcon, LogOut } from 'lucide-react';
-import { useGuestAuth } from '../contexts/GuestAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface NavigationProps {
   currentPage: 'home' | 'planner' | 'routes';
@@ -8,7 +8,7 @@ interface NavigationProps {
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate }) => {
-  const { user, logout } = useGuestAuth();
+  const { user, logout } = useAuth();
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
@@ -63,7 +63,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate 
               <div className="flex items-center space-x-2 sm:space-x-3 ml-2 sm:ml-4 pl-2 sm:pl-4 border-l border-gray-200">
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <span className="text-2xl">{user.avatar}</span>
-                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.name}</span>
+                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">{user.username}</span>
                 </div>
                 <button
                   onClick={logout}
