@@ -95,5 +95,10 @@ export const ratingService = {
     return apiCall(`/pub-ratings/${ratingId}`, {
       method: 'DELETE'
     });
+  },
+
+  // Get all pub ratings with averages in one call
+  async getAllPubRatings(): Promise<{ [pubId: string]: { average: number; count: number } }> {
+    return apiCall('/pub-ratings');
   }
 };

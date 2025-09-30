@@ -55,21 +55,26 @@ export const PubMap: React.FC<PubMapProps> = ({
     };
   }, []);
 
-  // Load ratings for all pubs
+  // Load ratings for all pubs - OPTIMIZED: one API call instead of many
   const loadRatings = async () => {
-    const ratings: { [pubId: string]: number } = {};
-    for (const pub of pubs) {
-      try {
-        console.log(`Loading rating for pub: ${pub.id} (${pub.name})`);
-        const avgRating = await ratingService.getAverageRating(pub.id);
-        console.log(`Rating for ${pub.id}: ${avgRating}`);
-        ratings[pub.id] = avgRating;
-      } catch (error) {
-        console.warn(`Failed to load rating for pub ${pub.id}:`, error);
-      }
+    try {
+      console.log('Loading all pub ratings in one call...');
+      const allRatings = await ratingService.getAllPubRatings();
+      console.log('All ratings loaded:', allRatings);
+      
+      // Convert to the format expected by the component
+      const ratings: { [pubId: string]: number } = {};
+      Object.keys(allRatings).forEach(pubId => {
+        ratings[pubId] = allRatings[pubId].average;
+      });
+      
+      setPubRatings(ratings);
+      console.log('Final pubRatings:', ratings);
+    } catch (error) {
+      console.error('Failed to load ratings:', error);
+      // Fallback to empty ratings
+      setPubRatings({});
     }
-    setPubRatings(ratings);
-    console.log('Final pubRatings:', ratings);
   };
 
   useEffect(() => {

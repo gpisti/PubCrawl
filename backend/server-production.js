@@ -426,6 +426,33 @@ app.get('/api/pub-ratings/:pubId', async (req, res) => {
   }
 });
 
+// Get all pub ratings with averages
+app.get('/api/pub-ratings', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        pr.pub_id,
+        AVG(pr.rating) as average_rating,
+        COUNT(pr.rating) as rating_count
+      FROM pub_ratings pr
+      GROUP BY pr.pub_id
+    `);
+    
+    const ratingsMap = {};
+    result.rows.forEach(row => {
+      ratingsMap[row.pub_id] = {
+        average: Math.round(parseFloat(row.average_rating) * 10) / 10,
+        count: parseInt(row.rating_count)
+      };
+    });
+    
+    res.json(ratingsMap);
+  } catch (error) {
+    console.error('Error fetching all ratings:', error);
+    res.status(500).json({ error: 'Failed to fetch ratings' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`PubCrawl API server running on port ${port}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
