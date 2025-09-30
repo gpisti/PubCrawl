@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Users, Share2, Copy, Check } from 'lucide-react';
-import { useGuestAuth } from '../contexts/GuestAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 
 interface RouteSharingProps {
@@ -23,7 +23,7 @@ export const RouteSharing: React.FC<RouteSharingProps> = ({
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
   
-  const { user } = useGuestAuth();
+  const { user } = useAuth();
 
   const shareUrl = `${window.location.origin}/join/${routeId}`;
   const isOwner = participants.length > 0 && participants[0] === user?.id;
