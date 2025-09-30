@@ -23,7 +23,7 @@ export const PubRatingComponent: React.FC<PubRatingProps> = ({ pubId, pubName, o
 
   useEffect(() => {
     loadRatings();
-  }, [pubId]);
+  }, [pubId, user?.id]); // Reload when user changes
 
   // Debug effect to track newRating changes
   useEffect(() => {
@@ -32,19 +32,15 @@ export const PubRatingComponent: React.FC<PubRatingProps> = ({ pubId, pubName, o
 
   const loadRatings = async () => {
     try {
-      const [pubRatings, avgRating, currentUserRating] = await Promise.all([
-        ratingService.getRatingsForPub(pubId),
-        ratingService.getAverageRating(pubId),
-        user ? ratingService.getUserRating(pubId, user.id) : Promise.resolve(null)
-      ]);
+      const { ratings, averageRating, userRating } = await ratingService.getRatingsData(pubId, user?.id);
       
-      setRatings(pubRatings);
-      setAverageRating(avgRating);
-      setUserRating(currentUserRating);
+      setRatings(ratings);
+      setAverageRating(averageRating);
+      setUserRating(userRating);
       
-      if (currentUserRating) {
-        setNewRating(currentUserRating.rating);
-        setNewComment(currentUserRating.comment);
+      if (userRating) {
+        setNewRating(userRating.rating);
+        setNewComment(userRating.comment);
       } else {
         // Reset to 0 if no existing rating
         setNewRating(0);
@@ -199,7 +195,7 @@ export const PubRatingComponent: React.FC<PubRatingProps> = ({ pubId, pubName, o
                     <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center space-x-2">
                         <span className="text-xs font-medium text-gray-900">
-                          {rating.userId === user?.id ? 'Te' : 'Felhasználó'}
+                          {rating.userId === user?.id ? 'Te' : rating.username}
                         </span>
                         <span className="text-xs text-gray-500">
                           {new Date(rating.createdAt).toLocaleDateString('hu-HU')}

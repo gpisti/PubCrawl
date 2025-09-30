@@ -50,6 +50,7 @@ export interface RouteWithPubCount extends Omit<Route, 'pubs'> {
     id: string;
     pubId: string;
     userId: string;
+    username: string;
     rating: number; // 1-5
     comment: string;
     createdAt: string;

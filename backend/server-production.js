@@ -405,9 +405,18 @@ app.get('/api/pub-ratings/:pubId', async (req, res) => {
     const { pubId } = req.params;
     
     const result = await pool.query(`
-      SELECT * FROM pub_ratings 
-      WHERE pub_id = $1 
-      ORDER BY created_at DESC
+      SELECT 
+        pr.id,
+        pr.pub_id,
+        pr.user_id,
+        pr.rating,
+        pr.comment,
+        pr.created_at,
+        u.username
+      FROM pub_ratings pr
+      JOIN users u ON pr.user_id = u.id
+      WHERE pr.pub_id = $1 
+      ORDER BY pr.created_at DESC
     `, [pubId]);
     
     res.json(result.rows);

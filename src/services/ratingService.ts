@@ -41,6 +41,7 @@ export const ratingService = {
       id: r.id,
       pubId: r.pub_id ?? r.pubId,
       userId: r.user_id ?? r.userId,
+      username: r.username,
       rating: r.rating,
       comment: r.comment ?? '',
       createdAt: r.created_at ?? r.createdAt,
@@ -62,6 +63,29 @@ export const ratingService = {
     } catch (error) {
       return null;
     }
+  },
+
+  // Optimalizált függvény: egy API hívással minden adatot lekér
+  async getRatingsData(pubId: string, userId?: string): Promise<{
+    ratings: PubRating[];
+    averageRating: number;
+    userRating: PubRating | null;
+  }> {
+    const ratings = await this.getRatingsForPub(pubId);
+    
+    const averageRating = ratings.length === 0 
+      ? 0 
+      : Math.round((ratings.reduce((total, rating) => total + rating.rating, 0) / ratings.length) * 10) / 10;
+    
+    const userRating = userId 
+      ? ratings.find(r => r.userId === userId) || null 
+      : null;
+    
+    return {
+      ratings,
+      averageRating,
+      userRating
+    };
   },
 
   async deleteRating(ratingId: string): Promise<{ message: string }> {
