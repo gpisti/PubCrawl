@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MessageSquare, User } from 'lucide-react';
 import { ratingService } from '../services/ratingService';
-import { useGuestAuth } from '../contexts/GuestAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { PubRating } from '../types';
 
 interface PubRatingProps {
@@ -19,7 +19,7 @@ export const PubRatingComponent: React.FC<PubRatingProps> = ({ pubId, pubName, o
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
-  const { user } = useGuestAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     loadRatings();
