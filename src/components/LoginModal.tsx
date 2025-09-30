@@ -50,11 +50,29 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }: Login
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+      <div className={`rounded-xl shadow-2xl max-w-md w-full p-6 ${
+        isLogin 
+          ? 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-200' 
+          : 'bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200'
+      }`}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {isLogin ? 'Bejelentkezés' : 'Regisztráció'}
-          </h2>
+          <div className="flex items-center space-x-3">
+            <div className={`text-3xl ${isLogin ? '🍺' : '🎉'}`}>
+              {isLogin ? '🍺' : '🎉'}
+            </div>
+            <div>
+              <h2 className={`text-2xl font-bold ${
+                isLogin ? 'text-emerald-800' : 'text-blue-800'
+              }`}>
+                {isLogin ? 'Bejelentkezés' : 'Regisztráció'}
+              </h2>
+              <p className={`text-sm ${
+                isLogin ? 'text-emerald-600' : 'text-blue-600'
+              }`}>
+                {isLogin ? 'Üdv újra a PubCrawl-ben!' : 'Csatlakozz a közösséghez!'}
+              </p>
+            </div>
+          </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -109,7 +127,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }: Login
           <button
             type="submit"
             disabled={isLoading || !username.trim() || !password.trim()}
-            className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className={`w-full text-white py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
+              isLogin 
+                ? 'bg-emerald-600 hover:bg-emerald-700' 
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
@@ -125,7 +147,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }: Login
         <div className="mt-6 text-center">
           <button
             onClick={switchMode}
-            className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
+            className={`text-sm font-medium transition-colors ${
+              isLogin 
+                ? 'text-blue-600 hover:text-blue-700' 
+                : 'text-emerald-600 hover:text-emerald-700'
+            }`}
           >
             {isLogin 
               ? 'Nincs még fiókod? Regisztrálj!' 
