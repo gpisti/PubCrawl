@@ -4,7 +4,7 @@ import { PubMap } from './PubMap';
 import { debrecenPubs, PubLocation } from '../data/debrecenPubs';
 import { optimizeRoute, OptimizedRoute } from '../utils/routeOptimizer';
 import { api } from '../services/api';
-import { useGuestAuth } from '../contexts/GuestAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface RouteOptimizerPageProps {
   onRouteCreated: () => void;
@@ -18,7 +18,7 @@ export const RouteOptimizerPage: React.FC<RouteOptimizerPageProps> = ({ onRouteC
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const { user } = useGuestAuth();
+  const { user } = useAuth();
 
   const handlePubSelect = (pub: PubLocation) => {
     if (!selectedPubs.some(selected => selected.id === pub.id)) {
