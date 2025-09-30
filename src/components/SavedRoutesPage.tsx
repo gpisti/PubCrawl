@@ -3,7 +3,7 @@ import { MapPin, Calendar, ArrowRight, Eye, Users, Trash2, AlertTriangle, Plus, 
 import { api } from '../services/api';
 import { RouteWithPubCount, Route, Drink, DrinkEntry } from '../types';
 import { RouteSharing } from './RouteSharing';
-import { useGuestAuth } from '../contexts/GuestAuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SavedRoutesPageProps {
   onCreateNew: () => void;
@@ -27,7 +27,7 @@ export const SavedRoutesPage: React.FC<SavedRoutesPageProps> = ({ onCreateNew }:
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const [drinkEntries, setDrinkEntries] = useState<DrinkEntry[]>([]);
-  const { user } = useGuestAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (user) {
