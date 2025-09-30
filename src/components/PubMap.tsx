@@ -56,20 +56,23 @@ export const PubMap: React.FC<PubMapProps> = ({
   }, []);
 
   // Load ratings for all pubs
-  useEffect(() => {
-    const loadRatings = async () => {
-      const ratings: { [pubId: string]: number } = {};
-      for (const pub of pubs) {
-        try {
-          const avgRating = await ratingService.getAverageRating(pub.id);
-          ratings[pub.id] = avgRating;
-        } catch (error) {
-          console.warn(`Failed to load rating for pub ${pub.id}:`, error);
-        }
+  const loadRatings = async () => {
+    const ratings: { [pubId: string]: number } = {};
+    for (const pub of pubs) {
+      try {
+        console.log(`Loading rating for pub: ${pub.id} (${pub.name})`);
+        const avgRating = await ratingService.getAverageRating(pub.id);
+        console.log(`Rating for ${pub.id}: ${avgRating}`);
+        ratings[pub.id] = avgRating;
+      } catch (error) {
+        console.warn(`Failed to load rating for pub ${pub.id}:`, error);
       }
-      setPubRatings(ratings);
-    };
+    }
+    setPubRatings(ratings);
+    console.log('Final pubRatings:', ratings);
+  };
 
+  useEffect(() => {
     loadRatings();
   }, [pubs]);
 
@@ -374,7 +377,11 @@ export const PubMap: React.FC<PubMapProps> = ({
         <PubRatingComponent
           pubId={selectedPubForRating.id}
           pubName={selectedPubForRating.name}
-          onClose={() => setSelectedPubForRating(null)}
+          onClose={() => {
+            setSelectedPubForRating(null);
+            // Refresh ratings when modal closes
+            loadRatings();
+          }}
         />
       )}
     </div>
